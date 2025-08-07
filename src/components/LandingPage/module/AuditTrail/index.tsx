@@ -1,25 +1,17 @@
 import { Button, Table, Tag } from "antd";
 import type { TableProps } from "antd";
-// import { useGetAuditTrail } from "../../../../react-query/useAuditTrail";
+import { useGetAuditTrail } from "../../../../react-query/useAuditTrail";
 import { EyeOutlined } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
-import { type ZGetDocumentExtractionResponseElement } from "../../../../service/audit-trail/model";
+// import { type ZGetAuditTrailResponseElement } from "../../../../service/audit-trail/model";
 import { useDetailAudit } from "./store/useDetailAudit";
-import apa from "./sample.json";
 
-type DataType = ZGetDocumentExtractionResponseElement;
+type DataType = any;
 
 function AuditTrail() {
-  //   const { data: auditTrailData } = useGetAuditTrail();
   const navigate = useNavigate();
-  const { setSelectedData } = useDetailAudit();
-
-  const convertedData: DataType[] = apa.map((item: any) => ({
-    ...item,
-    createdAt: new Date(item.createdAt),
-    updatedAt: new Date(item.updatedAt),
-    module: item.module as "classifier" | "extractor",
-  }));
+  const { setSelectedData, setIsVerification } = useDetailAudit();
+  const { data: auditTrailData } = useGetAuditTrail();
 
   const columns: TableProps<DataType>["columns"] = [
     {
@@ -36,6 +28,8 @@ function AuditTrail() {
           return <Tag color="blue">Classifier</Tag>;
         } else if (value === "extractor") {
           return <Tag color="green">Extractor</Tag>;
+        } else if (value === "verification") {
+          return <Tag color="purple">Verification</Tag>;
         }
       },
     },
@@ -80,6 +74,11 @@ function AuditTrail() {
             onClick={() => {
               navigate(`/landing-page/audit-trail/${record.uuid}`);
               setSelectedData(record);
+              if (record.module === "verification") {
+                setIsVerification(true);
+              } else {
+                setIsVerification(false);
+              }
             }}
           />
         </>
@@ -89,7 +88,7 @@ function AuditTrail() {
 
   return (
     <>
-      <Table<DataType> columns={columns} dataSource={convertedData} />
+      <Table<DataType> columns={columns} dataSource={auditTrailData} />
     </>
   );
 }

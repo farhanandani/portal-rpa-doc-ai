@@ -1,6 +1,9 @@
 import { Button, Modal, Select } from "antd";
 import { useState, useEffect } from "react";
-import { useExtractionManagement } from "../../../../../react-query/useExtractionManagement";
+import {
+  useExtractionManagement,
+  useGetDocumentListModelExtraction,
+} from "../../../../../react-query/useExtractionManagement";
 
 function ModalAnalyze({
   responseData,
@@ -15,8 +18,12 @@ function ModalAnalyze({
   const [localPdfUrl, setLocalPdfUrl] = useState<string>("");
   const [isDownloading, setIsDownloading] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [selectedModelId, setSelectedModelId] = useState<string>("");
 
   const { mutateAsync: mutateAsyncExtraction } = useExtractionManagement();
+
+  const { data: documentListModelExtraction } =
+    useGetDocumentListModelExtraction();
 
   useEffect(() => {
     setPdfUrl(
@@ -75,7 +82,7 @@ function ModalAnalyze({
     const payload = {
       blobPath: responseData?.results[0]?.blobPath,
       containerName: "infomediadocairesult",
-      modelId: "bast_extraction_v01",
+      modelId: selectedModelId,
       useAsTrainingData: false,
     };
 
@@ -103,10 +110,11 @@ function ModalAnalyze({
           </div>
           <Select
             placeholder="Select Model"
-            options={[
-              { label: "Bast Extraction", value: "bast_extraction_v01" },
-              { label: "Bast Extraction", value: "bast_extraction_v01" },
-            ]}
+            options={documentListModelExtraction?.map((item: any) => ({
+              label: item.modelId,
+              value: item.modelId,
+            }))}
+            onChange={(value) => setSelectedModelId(value)}
           />
           <Button onClick={handleProcessFile} loading={isProcessing}>
             Process File

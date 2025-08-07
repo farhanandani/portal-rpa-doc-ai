@@ -1,9 +1,9 @@
-import { Button, Modal, Select } from "antd";
+import { Button, Input, Modal, Select } from "antd";
+import { DeleteOutlined } from "@ant-design/icons";
 import { useState, useEffect } from "react";
-import {
-  useClassificationManagement,
-  useGetDocumentListModelClassification,
-} from "../../../../../react-query/useClassificationManagement";
+import { useGetDocumentListModelClassification } from "../../../../../react-query/useClassificationManagement";
+
+import { useVerificationManagement } from "../../../../../react-query/useVerificationManagement";
 
 function ModalAnalyze({
   responseData,
@@ -19,9 +19,10 @@ function ModalAnalyze({
   const [isDownloading, setIsDownloading] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   const [selectedModelId, setSelectedModelId] = useState<string>("");
+  const [rules, setRules] = useState<string[]>([]);
+  const [ruleInputs, setRuleInputs] = useState<string[]>([]);
 
-  const { mutateAsync: mutateAsyncClassification } =
-    useClassificationManagement();
+  const { mutateAsync: mutateAsyncVerification } = useVerificationManagement();
 
   const { data: documentListModelClassification } =
     useGetDocumentListModelClassification();
@@ -78,16 +79,40 @@ function ModalAnalyze({
     close();
   };
 
+  const handleAddRule = () => {
+    setRuleInputs([...ruleInputs, ""]);
+  };
+
+  const handleRemoveRule = (index: number) => {
+    const newRuleInputs = ruleInputs.filter((_, i) => i !== index);
+    setRuleInputs(newRuleInputs);
+
+    // Update rules array accordingly
+    const newRules = rules.filter((_, i) => i !== index);
+    setRules(newRules);
+  };
+
+  const handleRuleInputChange = (index: number, value: string) => {
+    const newRuleInputs = [...ruleInputs];
+    newRuleInputs[index] = value;
+    setRuleInputs(newRuleInputs);
+
+    // Update rules array
+    const newRules = [...rules];
+    newRules[index] = value;
+    setRules(newRules);
+  };
+
   const handleProcessFile = async () => {
     setIsProcessing(true);
     const payload = {
       blobPath: responseData?.results[0]?.blobPath,
       containerName: "infomediadocairesult",
-      modelId: selectedModelId,
-      useAsTrainingData: false,
+      classifierModelId: selectedModelId,
+      rules: rules.filter((rule) => rule.trim() !== ""),
     };
 
-    await mutateAsyncClassification({ payload });
+    await mutateAsyncVerification({ payload });
     handleClose();
     setIsProcessing(false);
   };
@@ -117,6 +142,37 @@ function ModalAnalyze({
             }))}
             onChange={(value) => setSelectedModelId(value)}
           />
+
+          {/* Rules Section */}
+          <div className="flex flex-col gap-2">
+            <div className="flex items-center justify-between">
+              <h4 className="text-sm font-medium">Rules</h4>
+              <Button type="dashed" size="small" onClick={handleAddRule}>
+                Add Rule
+              </Button>
+            </div>
+
+            {ruleInputs.map((rule, index) => (
+              // <Space key={index} style={{ width: "100%" }}>
+              <div className="flex items-center gap-2">
+                <Input
+                  placeholder={`Enter rule ${index + 1}`}
+                  value={rule}
+                  onChange={(e) => handleRuleInputChange(index, e.target.value)}
+                  className="flex-1"
+                />
+                <Button
+                  type="text"
+                  danger
+                  icon={<DeleteOutlined />}
+                  onClick={() => handleRemoveRule(index)}
+                  size="small"
+                />
+              </div>
+              // </Space>
+            ))}
+          </div>
+
           <Button onClick={handleProcessFile} loading={isProcessing}>
             Process File
           </Button>

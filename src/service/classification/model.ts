@@ -68,3 +68,40 @@ const CreateDocumentClassificationResponseSchema = z.object({
 export type ZCreateDocumentClassificationResponse = z.infer<
   typeof CreateDocumentClassificationResponseSchema
 >;
+
+// Get Document List Model Classification Response
+const AzureBlobFileListSourceSchema = z.object({
+  containerUrl: z.string(),
+  fileList: z.string(),
+});
+
+const BastSchema = z.object({
+  kind: z.string(),
+  azureBlobFileListSource: AzureBlobFileListSourceSchema,
+});
+
+const DocTypesSchema = z.object({
+  bast: BastSchema.optional(),
+  faktur_pajak: BastSchema.optional(),
+  kuitansi: BastSchema.optional(),
+  tagihan_invoice: BastSchema.optional(),
+  surat_pesanan: BastSchema.optional(),
+  enofa: BastSchema.optional(),
+  npwp: BastSchema.optional(),
+});
+
+const GetDocumentListModelClassificationResponseElementSchema = z.array(
+  z.object({
+    classifierId: z.string(),
+    createdDateTime: z.coerce.date(),
+    modifiedDateTime: z.coerce.date(),
+    expirationDateTime: z.coerce.date(),
+    apiVersion: z.string(),
+    docTypes: DocTypesSchema,
+    description: z.string(),
+  })
+);
+
+export type ZGetDocumentListModelClassificationResponse = z.infer<
+  typeof GetDocumentListModelClassificationResponseElementSchema
+>;

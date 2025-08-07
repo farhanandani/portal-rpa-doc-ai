@@ -1,31 +1,23 @@
-import { Card, Collapse, type CollapseProps } from "antd";
+import { Card } from "antd";
+import Classifier from "./module/Classifier";
+import Extraction from "./module/Extraction";
+import ListModelExtraction from "./module/ListModelExtraction";
+import UploadFile from "./module/UploadFile";
+import ListModelClassification from "./module/ListModelClassification";
+import Verification from "./module/Verification";
 
-const text = `
-A dog is a type of domesticated animal.
-Known for its loyalty and faithfulness,
-it can be found as a welcome guest in many households across the world.
-`;
-
-const items: CollapseProps["items"] = [
-  {
-    key: "1",
-    label: "API Integration",
-    children: <p>{text}</p>,
-  },
-];
 function ApiIntegration() {
   return (
     <>
       <div className="w-full h-full flex flex-col gap-4">
         <Card className="w-full h-full">
           <div className="flex flex-col gap-4">
-            <div>
-              <Collapse defaultActiveKey={["1"]} ghost items={items} />
-            </div>
-            <p>
-              Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam,
-              quos. 
-            </p>
+            <UploadFile />
+            <ListModelClassification />
+            <ListModelExtraction />
+            <Classifier />
+            <Extraction />
+            <Verification />
           </div>
         </Card>
       </div>

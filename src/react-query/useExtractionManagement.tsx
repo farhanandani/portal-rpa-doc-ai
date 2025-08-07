@@ -1,11 +1,13 @@
 import {
   // useQuery,
   useMutation,
+  useQuery,
   useQueryClient,
 } from "@tanstack/react-query";
 import { ExtractionAPI } from "../service/extraction/service";
 
 import { useInfoViewStore } from "../store/core/infoView";
+import type { ZGetDocumentListModelExtractionResponse } from "../service/extraction/model";
 
 export const QUERY_KEY = ["EXTRACTION_MANAGEMENT"];
 export const QUERY_KEY_DETAIL = ["DETAIL_EXTRACTION_MANAGEMENT"];
@@ -36,5 +38,24 @@ export const useExtractionManagement = () => {
       console.error(error);
       fetchError(error.message);
     },
+  });
+};
+
+// -----
+
+const fetchDataGetDocumentListModelExtraction =
+  async (): Promise<ZGetDocumentListModelExtractionResponse> => {
+    try {
+      const data = await ExtractionAPI.getDocumentListModelExtraction();
+      return data;
+    } catch (error: any) {
+      return error;
+    }
+  };
+
+export const useGetDocumentListModelExtraction = () => {
+  return useQuery({
+    queryKey: QUERY_KEY_DETAIL,
+    queryFn: fetchDataGetDocumentListModelExtraction,
   });
 };
