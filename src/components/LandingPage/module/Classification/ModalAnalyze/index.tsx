@@ -25,6 +25,7 @@ function ModalAnalyze({
 
   const { data: documentListModelClassification } =
     useGetDocumentListModelClassification();
+  console.log("responseData", documentListModelClassification);
 
   useEffect(() => {
     setPdfUrl(
@@ -112,7 +113,7 @@ function ModalAnalyze({
           <Select
             placeholder="Select Model"
             options={documentListModelClassification?.map((item: any) => ({
-              label: item.description,
+              label: item.classifierId,
               value: item.classifierId,
             }))}
             onChange={(value) => setSelectedModelId(value)}

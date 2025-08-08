@@ -2,6 +2,7 @@ import { Steps, Progress, Button, Tag } from "antd";
 import { useEffect, useState } from "react";
 import { useDetailAudit } from "../store/useDetailAudit";
 import { useGetDetailVerification } from "../../../../../react-query/useAuditTrail";
+import { useNavigate } from "react-router-dom";
 
 // Fungsi untuk memformat field name menjadi lebih readable
 const formatFieldName = (fieldName: string) => {
@@ -34,6 +35,7 @@ const mapExtractionData = (extractionData: any) => {
 };
 
 function Verification() {
+  const navigate = useNavigate();
   const { selectedData } = useDetailAudit();
   const [currentStep, setCurrentStep] = useState(0);
 
@@ -704,21 +706,48 @@ function Verification() {
 
   return (
     <div className="w-full flex flex-col h-full">
+      <div className="flex-1 min-h-0">{steps[currentStep]?.content}</div>
       <Steps
         current={currentStep}
         items={items}
         onChange={setCurrentStep}
         className="mb-6"
       />
-      <div className="flex-1 min-h-0">{steps[currentStep]?.content}</div>
-      <div className="flex gap-2 ml-4 mt-4">
-        <Button type="primary" onClick={() => setCurrentStep(currentStep - 1)}>
-          Previous
-        </Button>
-        <Button type="primary" onClick={() => setCurrentStep(currentStep + 1)}>
-          Next
-        </Button>
-      </div>
+      {currentStep < 2 ? (
+        <>
+          <div className="flex gap-2 ml-4 mt-4">
+            <Button
+              type="primary"
+              onClick={() => setCurrentStep(currentStep - 1)}
+            >
+              Previous
+            </Button>
+            <Button
+              type="primary"
+              onClick={() => setCurrentStep(currentStep + 1)}
+            >
+              Next
+            </Button>
+          </div>
+        </>
+      ) : (
+        <>
+          <div className="flex gap-2 ml-4 mt-4">
+            <Button
+              type="primary"
+              onClick={() => setCurrentStep(currentStep - 1)}
+            >
+              Previous
+            </Button>
+            <Button
+              type="primary"
+              onClick={() => navigate("/landing-page/audit-trail")}
+            >
+              Done
+            </Button>
+          </div>
+        </>
+      )}
     </div>
   );
 }
