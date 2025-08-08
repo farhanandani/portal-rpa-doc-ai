@@ -135,6 +135,21 @@ function Verification() {
     }
   };
 
+  const formatDocumentValue = (documentValue: any) => {
+    if (!documentValue) return "N/A";
+
+    // Jika documentValue adalah object
+    if (typeof documentValue === "object" && documentValue !== null) {
+      return Object.entries(documentValue)
+        .map(([key, value]) => `${formatFieldName(key)}: ${value || "N/A"}`)
+        .join(", ");
+    }
+
+    // Jika documentValue adalah string atau number
+    return String(documentValue);
+  };
+
+  // Memetakan data extractor
   useEffect(() => {
     if (extractorData) {
       if (extractorData.annotatedExtractorDocumentBlobFilePath) {
@@ -608,8 +623,9 @@ function Verification() {
                               Document Value:
                             </p>
                             <p className="text-sm text-gray-600">
-                              {item.verificationData?.[0]?.documentValue ||
-                                "N/A"}
+                              {formatDocumentValue(
+                                item.verificationData?.[0]?.documentValue
+                              )}
                             </p>
                           </div>
                           <div>
